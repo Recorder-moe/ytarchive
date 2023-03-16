@@ -30,10 +30,9 @@ jobs:
         id: setup
         uses: ./.github/workflows/docker-reused-setup-steps
         with:
+          DOCKERHUB_ORGANIZATION_NAME : ${{ secrets.DOCKERHUB_ORGANIZATION_NAME }}
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
           DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
-          QUAY_USERNAME: ${{ secrets.QUAY_USERNAME }}
-          QUAY_TOKEN: ${{ secrets.QUAY_TOKEN }}
           tag: alpine
 
       - name: Build and push
@@ -50,28 +49,19 @@ jobs:
             VERSION=${{ github.head_ref || github.ref_name }}
             RELEASE=${{ github.run_number }}
           platforms: linux/amd64,linux/arm64
-          # Cache to registry instead of gha to avoid the capacity limit.
-          cache-from: type=registry,ref=ghcr.io/${{ github.repository_owner }}/ytarchive:cache
-          cache-to: type=registry,ref=ghcr.io/${{ github.repository_owner }}/ytarchive:cache,mode=max
           sbom: true
           provenance: true
 
       - name: Attest DockerHub image (alpine)
         uses: actions/attest-build-provenance@v2
         with:
-          subject-name: index.docker.io/${{ secrets.DOCKERHUB_USERNAME }}/ytarchive
+          subject-name: index.docker.io/${{ inputs.DOCKERHUB_ORGANIZATION_NAME }}/ytarchive
           subject-digest: ${{ steps.build_push_alpine.outputs.digest }}
 
       - name: Attest GHCR image (alpine)
         uses: actions/attest-build-provenance@v2
         with:
           subject-name: ghcr.io/${{ github.repository_owner }}/ytarchive
-          subject-digest: ${{ steps.build_push_alpine.outputs.digest }}
-
-      - name: Attest Quay image (alpine)
-        uses: actions/attest-build-provenance@v2
-        with:
-          subject-name: quay.io/${{ github.repository_owner }}/ytarchive
           subject-digest: ${{ steps.build_push_alpine.outputs.digest }}
 
   docker-ubi:
@@ -87,10 +77,9 @@ jobs:
         id: setup
         uses: ./.github/workflows/docker-reused-setup-steps
         with:
+          DOCKERHUB_ORGANIZATION_NAME : ${{ secrets.DOCKERHUB_ORGANIZATION_NAME }}
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
           DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
-          QUAY_USERNAME: ${{ secrets.QUAY_USERNAME }}
-          QUAY_TOKEN: ${{ secrets.QUAY_TOKEN }}
           tag: ubi
 
       - name: Build and push
@@ -107,28 +96,19 @@ jobs:
             VERSION=${{ github.head_ref || github.ref_name }}
             RELEASE=${{ github.run_number }}
           platforms: linux/amd64,linux/arm64
-          # Cache to registry instead of gha to avoid the capacity limit.
-          cache-from: type=registry,ref=ghcr.io/${{ github.repository_owner }}/ytarchive:cache
-          cache-to: type=registry,ref=ghcr.io/${{ github.repository_owner }}/ytarchive:cache,mode=max
           sbom: true
           provenance: true
 
       - name: Attest DockerHub image (ubi)
         uses: actions/attest-build-provenance@v2
         with:
-          subject-name: index.docker.io/${{ secrets.DOCKERHUB_USERNAME }}/ytarchive
+          subject-name: index.docker.io/${{ inputs.DOCKERHUB_ORGANIZATION_NAME }}/ytarchive
           subject-digest: ${{ steps.build_push_ubi.outputs.digest }}
 
       - name: Attest GHCR image (ubi)
         uses: actions/attest-build-provenance@v2
         with:
           subject-name: ghcr.io/${{ github.repository_owner }}/ytarchive
-          subject-digest: ${{ steps.build_push_ubi.outputs.digest }}
-
-      - name: Attest Quay image (ubi)
-        uses: actions/attest-build-provenance@v2
-        with:
-          subject-name: quay.io/${{ github.repository_owner }}/ytarchive
           subject-digest: ${{ steps.build_push_ubi.outputs.digest }}
 
   docker-distroless:
@@ -144,10 +124,9 @@ jobs:
         id: setup
         uses: ./.github/workflows/docker-reused-setup-steps
         with:
+          DOCKERHUB_ORGANIZATION_NAME : ${{ secrets.DOCKERHUB_ORGANIZATION_NAME }}
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
           DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
-          QUAY_USERNAME: ${{ secrets.QUAY_USERNAME }}
-          QUAY_TOKEN: ${{ secrets.QUAY_TOKEN }}
           tag: distroless
 
       - name: Build and push
@@ -164,16 +143,13 @@ jobs:
             VERSION=${{ github.head_ref || github.ref_name }}
             RELEASE=${{ github.run_number }}
           platforms: linux/amd64,linux/arm64
-          # Cache to registry instead of gha to avoid the capacity limit.
-          cache-from: type=registry,ref=ghcr.io/${{ github.repository_owner }}/ytarchive:cache
-          cache-to: type=registry,ref=ghcr.io/${{ github.repository_owner }}/ytarchive:cache,mode=max
           sbom: true
           provenance: true
 
       - name: Attest DockerHub image (distroless)
         uses: actions/attest-build-provenance@v2
         with:
-          subject-name: index.docker.io/${{ secrets.DOCKERHUB_USERNAME }}/ytarchive
+          subject-name: index.docker.io/${{ inputs.DOCKERHUB_ORGANIZATION_NAME }}/ytarchive
           subject-digest: ${{ steps.build_push_distroless.outputs.digest }}
 
       - name: Attest GHCR image (distroless)
@@ -182,8 +158,3 @@ jobs:
           subject-name: ghcr.io/${{ github.repository_owner }}/ytarchive
           subject-digest: ${{ steps.build_push_distroless.outputs.digest }}
 
-      - name: Attest Quay image (distroless)
-        uses: actions/attest-build-provenance@v2
-        with:
-          subject-name: quay.io/${{ github.repository_owner }}/ytarchive
-          subject-digest: ${{ steps.build_push_distroless.outputs.digest }}
