@@ -31,7 +31,7 @@ RUN --mount=type=cache,id=apt-$TARGETARCH$TARGETVARIANT,sharing=locked,target=/v
 ########################################
 # Final stage
 ########################################
-FROM scratch as final
+FROM busybox:1 as final
 
 ARG UID
 
@@ -57,7 +57,7 @@ COPY --link --from=compress /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 # https://docs.openshift.com/container-platform/4.14/openshift_images/create-images.html#use-uid_create-images
 COPY --link --chown=$UID:0 --chmod=775 --from=compress /go/bin/ytarchive /
 
-ENV PATH="/"
+ENV PATH="/:$PATH"
 
 WORKDIR /download
 
